@@ -1,0 +1,36 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeFile="PlanningDataMaster.master.cs" Inherits="PlanningDataMaster" %>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head id="Head1" runat="server">
+    <title>Georgia Communities Data</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link href="style.css" rel="stylesheet" type="text/css" />
+
+    <!--[if lt IE 8]>
+	    <link rel="stylesheet" type="text/css" href="LESS-THAN-IE6-SPECIFIC.css" />
+    <![endif]-->
+</head>
+<body>
+    <form id="form1" runat="server">
+    <div id="wrapper">
+        <div id="header1">
+           
+        </div>
+        
+            <div id="content">
+                <div id="pageTitle">
+                    <asp:Label runat="server" ID="community" Text="" />
+                </div>
+               <asp:ContentPlaceHolder runat="server" ID="ContentPlaceHolder1" />
+            </div>
+            <div style="clear: both;">
+            </div>
+
+        <div id="footer">
+            <p>&copy;2018 Georgia Department of Community Affairs</p>
+            <a href="http://www.ga.gov/"><img src="images/DCALogoColorHor.jpg" alt="Georgia Logo" border="0"/></a>
+        </div>
+    </div>
+    </form>
+</body>
+</html>

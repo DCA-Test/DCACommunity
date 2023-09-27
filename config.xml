@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<config>
+  <extent>-85.7,30.20,-80.50,35.2</extent>
+  <spatialReference>104000</spatialReference>
+  <baseLayers>
+    <name>http://server.arcgisonline.com/ArcGIS/rest/services/ESRI_StreetMap_World_2D/MapServer</name>
+    <type>tiled</type>
+    <opacity>0.2</opacity>
+  </baseLayers>
+  <baseLayers>
+    <name>http://www.georgiaplanning.com/ArcGIS/rest/services/SnapshotDemog/MapServer</name>
+    <type>dynamic</type>
+    <opacity>1.0</opacity>
+  </baseLayers>
+  <queryLayer>
+    <name>http://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3</name>
+  </queryLayer>
+  <links>
+    <countyLinkPage>http://dca.ga.gov/CountySnapshotsNet/countysnapshot.aspx?fips=</countyLinkPage>
+    <cityLinkPage>http://www.georgiaplanning.com/dataviews/census2/dv0.asp</cityLinkPage>
+  </links>
+  <connectionString>Data Source=sqldevcluster;Initial Catalog=DCA;User Id=dca_app;Password=a2B5clr;</connectionString>
+  <sqlQuery>
+    <tableName>CityIntersect</tableName>
+    <selectFields>PLCIDFP, NAME, SHAPE_AREA</selectFields>
+    <whereField>CNTYIDFP</whereField>
+  </sqlQuery>
+</config>

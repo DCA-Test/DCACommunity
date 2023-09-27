@@ -1,0 +1,132 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeFile="MasterPage.master.cs" Inherits="MasterPage" %>
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title>Georgia Communities Data</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link href="style.css" rel="stylesheet" type="text/css" />
+
+    <!--[if lt IE 8]>
+	    <link rel="stylesheet" type="text/css" href="LESS-THAN-IE6-SPECIFIC.css" />
+    <![endif]-->
+</head>
+<body>
+    <form id="form1" runat="server">
+    <div id="wrapper">
+        <div id="header">  
+            <%if (Request.UserAgent.IndexOf("AppleWebKit") > 0){ %>
+                <br /><p /><br />
+            <% }else { %>
+                <br /><p /><br /><p /><br /><br />
+            <%} %>
+            
+            <table width="505px" border="0" style="text-align:center;" align="center">
+       
+                <tr><td>&nbsp;</td></tr><br/>
+                <tr>
+                    <td style="text-align:center;">
+                        <p id="pageTitle"/> <asp:Label runat="server" ID="community" Text="" style="font-size: 18px; text-decoration: underline;"/><br />
+                        <asp:Menu ID="topMenus" runat="server" Orientation="Horizontal" Visible="False" StaticMenuItemStyle-HorizontalPadding="20px" Width="450px">
+                            <DynamicItemTemplate>
+                                <%# Eval("Text") %>
+                            </DynamicItemTemplate>
+                            <Items>
+                                <asp:MenuItem Text="HOME" NavigateUrl="" />
+                                <%--<asp:MenuItem Text="PROFILE" NavigateUrl="" />--%>
+                                <asp:MenuItem Text="PLAN" NavigateUrl="" />
+                                <%--
+						        <asp:MenuItem Text="ACTION" NavigateUrl="" />
+                                <asp:MenuItem Text="MAP" NavigateUrl="" />
+                                <asp:MenuItem Text="DOCS" NavigateUrl="" />
+						
+                                <asp:MenuItem Text="CONNECT" NavigateUrl="" />--%>
+                            </Items>
+                        </asp:Menu>            
+                    </td>
+                </tr>
+            </table>
+        </div> 
+        <div>
+            <!--<div id="leftcolumn">
+                <asp:Panel runat="server" ID="sideMenu" Visible="false">
+                    <div class="newMenu">
+                        <div class="newmenuleft">
+                            <asp:LinkButton ID="LinkButton1" runat="server" Text="HOME" PostBackUrl="" />
+                        </div>
+                        <div class="newsubmenu">
+                            Takes you back to your
+                            Community Status Page
+                        </div>
+                    </div>
+                    <div class="newMenu">
+                        <div class="newmenuleft">
+                            <asp:LinkButton ID="LinkButton2" runat="server" Text="PROFILE" PostBackUrl="" />
+                        </div>
+                        <div class="newsubmenu">
+                            Population, Economic,
+                            and Housing Demographics
+                        </div>
+                    </div>
+                    <div class="newMenu">
+                        <div class="newmenuleft">
+                            <asp:LinkButton ID="LinkButton3" runat="server" Text="PLAN" PostBackUrl="" />
+                        </div>
+                        <div class="newsubmenu">
+                            Preparation, Requirements,
+                            Recommendations and Planning Tools
+                        </div>
+                    </div>
+                    <div class="newMenu">
+                        <div class="newmenuleft">
+                            <asp:LinkButton ID="LinkButton4" runat="server" Text="ACTION" PostBackUrl="" />
+                        </div>
+                        <div class="newsubmenu">
+                            Implementation Resources
+                            and Technical Assistance
+                        </div>
+                    </div>
+                    <div class="newMenu">
+                        <div class="newmenuleft">
+                            <asp:LinkButton ID="LinkButton5" runat="server" Text="MAP" PostBackUrl="" />
+                        </div>
+                        <div class="newsubmenu">
+                            Geographic Information
+                            Systems and Online Mapping
+                        </div>
+                    </div>
+                    <div class="newMenu">
+                        <div class="newmenuleft">
+                            <asp:LinkButton ID="LinkButton6" runat="server" Text="DOCS" PostBackUrl="" />
+                        </div>
+                        <div class="newsubmenu">
+                            Comprehensive Plan, Service
+                            Delivery Strategy, CIE, etc.
+                        </div>
+                    </div>
+                    <div class="newMenu">
+                        <div class="newmenuleft">
+                            <asp:LinkButton ID="LinkButton7" runat="server" Text="CONNECT" PostBackUrl="" />
+                        </div>
+                        <div class="newsubmenu">
+                            All your favorite
+                            places to go on the Web
+                        </div>
+                    </div>
+                </asp:Panel>
+            </div>--><br/>
+            <div id="content">
+                
+               <asp:ContentPlaceHolder runat="server" ID="ContentPlaceHolder1" />
+            </div>
+            
+        </div>
+        <div style="height: 35px;"></div>
+        <div id="footer">
+            <p>&copy;2018 Georgia Department of Community Affairs</p>
+            <a href="http://www.dca.ga.gov/"><img src="images/DCALogoColorHor.JPG" alt="Georgia Logo" border="0"/></a>
+        </div>
+    </div>
+    </form>
+</body>
+</html>

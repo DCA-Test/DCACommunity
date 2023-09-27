@@ -1,0 +1,319 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>County Snapshots</title>
+    <link rel="stylesheet" type="text/css" href="http://serverapi.arcgisonline.com/jsapi/arcgis/1.3/js/dojo/dijit/themes/tundra/tundra.css"/>
+    <script type="text/javascript">djConfig = { parseOnLoad:true }</script>
+    <script type="text/javascript" src="http://serverapi.arcgisonline.com/jsapi/arcgis/?v=1.3"></script>
+    <script type="text/javascript">
+      dojo.require("esri.map");
+      dojo.require("esri.tasks.query");
+      
+      dojo.require("dijit.layout.ContentPane");
+      dojo.require("dijit.layout.TabContainer");
+      dojo.require("dijit.form.ComboBox");
+      dojo.require("dojo.data.ItemFileReadStore");
+
+      var map, queryTask, query, click;
+      var wd = 275;
+      var ht = 100;
+      var chartParams = { cht:"p3", chl:"Under 5|Age 18 - 21|Age 22 - 29|Age 30 - 39|Age 40 -49| Age 50- 64| Age 65 +"  };
+
+      function init() {
+          var extent = new esri.geometry.Extent(-86.0,30.00,-80.00,35.00, new esri.SpatialReference({"wkid":104000}));
+        map = new esri.Map("map",{"extent":extent});
+        map.addLayer(new esri.layers.ArcGISTiledMapServiceLayer("http://server.arcgisonline.com/ArcGIS/rest/services/ESRI_StreetMap_World_2D/MapServer"));
+        map.addLayer(new esri.layers.ArcGISDynamicMapServiceLayer("http://www.georgiaplanning.com/ArcGIS/rest/services/RDCLarge/MapServer",{"opacity":0.9}));
+        if (map.loaded)
+            initFunctionality();
+         else
+            dojo.connect(map, "onLoad", initFunctionality);
+          dojo.connect(map.infoWindow, "onShow", function() {
+          dijit.byId("tabs").resize();
+        });
+      }
+      function initFunctionality(){
+        map.hideZoomSlider();
+        
+        dojo.connect(map, "onClick", doQuery);
+
+        queryTask = new esri.tasks.QueryTask("http://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3");
+        dojo.connect(queryTask, "onComplete", getChart);
+
+        dojo.connect(map.infoWindow, "onHide", function() {map.graphics.clear();});
+        query = new esri.tasks.Query();
+        query.spatialRelationship = esri.tasks.Query.SPATIAL_REL_INTERSECTS;
+        query.outFields = ["NAME", "POP2000", "POP2007", "POP00_SQMI", "POP07_SQMI", "FIPS", "MED_AGE", "AGE_UNDER5","AGE_5_17","AGE_18_21","AGE_22_29","AGE_30_39","AGE_40_49","AGE_50_64","AGE_65_UP"];
+        query.returnGeometry = true;
+        map.infoWindow.resize(335,180);
+        map.infoWindow.setContent(dijit.byId("tabs").domNode);
+      }
+
+      function doQuery(evt) {
+        
+        click = query.geometry = evt.mapPoint;
+        
+        queryTask.execute(query);
+      }
+
+      function getChart(featureSet) {
+        map.graphics.clear();
+
+        var features = featureSet.features;
+        var feature, attributes, white, black, asian, hispanic, other, total, graphic, age1,age2,age3,age4,age5,age6,age7,age8;
+        for (var i=0; i<features.length; i++) {
+          feature = features[i];
+          attributes = feature.attributes;
+            
+          var content="<b>2000 Population: </b>"+attributes.POP2000+"<br/>"
+                             + "<b>2007 Population: </b>"+attributes.POP2007+"<br/>"
+                             + "<b>2000 Persons per SqMi: </b>"+attributes.POP00_SQMI+"<br/>"
+                             + "<b>2007 Persons per SqMi: </b>"+attributes.POP07_SQMI+"<br/>"
+                             + "<b>2000 Median Age: </b>"+attributes.MED_AGE+"<br/>"
+                             + "<b>FIPS: </b>"+ attributes.FIPS+"  "
+                             + "<b><a href='http://dca.ga.gov/CountySnapshotsNet/countysnapshot.aspx?fips="+attributes.FIPS+"' target=_blank >View County</a></b>";;  
+          age1=parseInt(attributes.AGE_UNDER5);
+          age2=parseInt(attributes.AGE_5_17);
+          age3=parseInt(attributes.AGE_18_21);
+          age4=parseInt(attributes.AGE_22_29);
+          age5=parseInt(attributes.AGE_30_39);
+          age6=parseInt(attributes.AGE_40_49);
+          age7=parseInt(attributes.AGE_50_64);
+          age8=parseInt(attributes.AGE_65_UP);  
+                  
+          total = age1+age2+age3+age4+age5+age6+age7+age8;
+
+          age1 = (age1 / total) * 100;
+          age2 = (age2 / total) * 100;
+          age3 = (age3 / total) * 100;
+          age4 = (age4 / total) * 100;
+          age5 = (age5 / total) * 100;
+          age6 = (age6 / total) * 100;
+          age7 = (age7 / total) * 100;
+          age8 = (age8 / total) * 100;
+          
+          
+          var params = dojo.mixin({
+              chf:"bg,s,FFFFFF50",
+              chs:wd + "x" + ht,
+              chd: "t:" + age1 + "," + age2 + "," + age3 + "," + age4 + "," + age5 + "," + age6 + "," + age7 + "," + age8
+            }, chartParams);
+            
+          var mySymbol = new esri.symbol.SimpleFillSymbol("none", new esri.symbol.SimpleLineSymbol("solid", new dojo.Color([255,0,0]), 2.5), new dojo.Color([255,255,0,0.25]));
+
+          feature.setSymbol(mySymbol);
+
+          map.infoWindow.setTitle(attributes["NAME"]);
+          map.graphics.add(feature);
+
+          dijit.byId("layer2Tab").setContent(content);
+          dijit.byId("layer3Tab").setContent("<img src=\"" + "http://chart.apis.google.com/chart?"+ decodeURIComponent(dojo.objectToQuery(params)) + "\" />");
+          
+          
+          map.infoWindow.show(map.toScreen(click),map.getInfoWindowAnchor(map.toScreen(click)));
+        }
+      }
+      
+       function setVal2(value) {
+           alert("Selected "+value);
+       }
+
+      dojo.addOnLoad(init);
+    </script>
+  </head>
+  <body class="tundra">
+    <span style="font-size:200%; font-weight:bold; text-align:center;">Select Your Community</span>
+    <div><br /></div>
+    <div>
+    Select County :
+        <select name="countyName" 
+                dojoType="dijit.form.ComboBox" 
+                autocomplete="false" 
+                onchange="setVal2" style="width: 100px"> 
+            <option value="Appling">Appling</option>
+            <option value="Atkinson">Atkinson</option>
+            <option value="Bacon">Bacon</option>
+            <option value="Baker">Baker</option>
+            <option value="Baldwin">Baldwin</option>
+            <option value="Banks">Banks</option>
+            <option value="Barrow">Barrow</option>
+            <option value="Bartow">Bartow</option>
+            <option value="Ben Hill">Ben Hill</option>
+            <option value="Berrien">Berrien</option>
+            <option value="Bibb">Bibb</option>
+            <option value="Bleckley">Bleckley</option>
+            <option value="Brantley">Brantley</option>
+            <option value="Brooks">Brooks</option>
+            <option value="Bryan">Bryan</option>
+            <option value="Bulloch">Bulloch</option>
+            <option value="Burke">Burke</option>
+            <option value="Butts">Butts</option>
+            <option value="Calhoun">Calhoun</option>
+            <option value="Camden">Camden</option>
+            <option value="Candler">Candler</option>
+            <option value="Carroll">Carroll</option>
+            <option value="Catoosa">Catoosa</option>
+            <option value="Charlton">Charlton</option>
+            <option value="Chatham">Chatham</option>
+            <option value="Chattahoochee">Chattahoochee</option>
+            <option value="Chattooga">Chattooga</option>
+            <option value="Cherokee">Cherokee</option>
+            <option value="Clarke">Clarke</option>
+            <option value="Clay">Clay</option>
+            <option value="Clayton">Clayton</option>
+            <option value="Clinch">Clinch</option>
+            <option value="Cobb">Cobb</option>
+            <option value="Coffee">Coffee</option>
+            <option value="Colquitt">Colquitt</option>
+            <option value="Columbia">Columbia</option>
+            <option value="Cook">Cook</option>
+            <option value="Coweta">Coweta</option>
+            <option value="Crawford">Crawford</option>
+            <option value="Crisp">Crisp</option>
+            <option value="Dade">Dade</option>
+            <option value="Dawson">Dawson</option>
+            <option value="Decatur">Decatur</option>
+            <option value="DeKalb">DeKalb</option>
+            <option value="Dodge">Dodge</option>
+            <option value="Dooly">Dooly</option>
+            <option value="Dougherty">Dougherty</option>
+            <option value="Douglas">Douglas</option>
+            <option value="Early">Early</option>
+            <option value="Echols">Echols</option>
+            <option value="Effingham">Effingham</option>
+            <option value="Elbert">Elbert</option>
+            <option value="Emanuel">Emanuel</option>
+            <option value="Evans">Evans</option>
+            <option value="Fannin">Fannin</option>
+            <option value="Fayette">Fayette</option>
+            <option value="Floyd">Floyd</option>
+            <option value="Forsyth">Forsyth</option>
+            <option value="Franklin">Franklin</option>
+            <option value="Fulton">Fulton</option>
+            <option value="Gilmer">Gilmer</option>
+            <option value="Glascock">Glascock</option>
+            <option value="Glynn">Glynn</option>
+            <option value="Gordon">Gordon</option>
+            <option value="Grady">Grady</option>
+            <option value="Greene">Greene</option>
+            <option value="Gwinnett">Gwinnett</option>
+            <option value="Habersham">Habersham</option>
+            <option value="Hall">Hall</option>
+            <option value="Hancock">Hancock</option>
+            <option value="Haralson">Haralson</option>
+            <option value="Harris">Harris</option>
+            <option value="Hart">Hart</option>
+            <option value="Heard">Heard</option>
+            <option value="Henry">Henry</option>
+            <option value="Houston">Houston</option>
+            <option value="Irwin">Irwin</option>
+            <option value="Jackson">Jackson</option>
+            <option value="Jasper">Jasper</option>
+            <option value="Jeff Davis">Jeff Davis</option>
+            <option value="Jefferson">Jefferson</option>
+            <option value="Jenkins">Jenkins</option>
+            <option value="Johnson">Johnson</option>
+            <option value="Jones">Jones</option>
+            <option value="Lamar">Lamar</option>
+            <option value="Lanier">Lanier</option>
+            <option value="Laurens">Laurens</option>
+            <option value="Lee">Lee</option>
+            <option value="Liberty">Liberty</option>
+            <option value="Lincoln">Lincoln</option>
+            <option value="Long">Long</option>
+            <option value="Lowndes">Lowndes</option>
+            <option value="Lumpkin">Lumpkin</option>
+            <option value="Macon">Macon</option>
+            <option value="Madison">Madison</option>
+            <option value="Marion">Marion</option>
+            <option value="McDuffie">McDuffie</option>
+            <option value="McIntosh">McIntosh</option>
+            <option value="Meriwether">Meriwether</option>
+            <option value="Miller">Miller</option>
+            <option value="Mitchell">Mitchell</option>
+            <option value="Monroe">Monroe</option>
+            <option value="Montgomery">Montgomery</option>
+            <option value="Morgan">Morgan</option>
+            <option value="Murray">Murray</option>
+            <option value="Muscogee">Muscogee</option>
+            <option value="Newton">Newton</option>
+            <option value="Oconee">Oconee</option>
+            <option value="Oglethorpe">Oglethorpe</option>
+            <option value="Paulding">Paulding</option>
+            <option value="Peach">Peach</option>
+            <option value="Pickens">Pickens</option>
+            <option value="Pierce">Pierce</option>
+            <option value="Pike">Pike</option>
+            <option value="Polk">Polk</option>
+            <option value="Pulaski">Pulaski</option>
+            <option value="Putnam">Putnam</option>
+            <option value="Quitman">Quitman</option>
+            <option value="Rabun">Rabun</option>
+            <option value="Randolph">Randolph</option>
+            <option value="Richmond">Richmond</option>
+            <option value="Rockdale">Rockdale</option>
+            <option value="Schley">Schley</option>
+            <option value="Screven">Screven</option>
+            <option value="Seminole">Seminole</option>
+            <option value="Spalding">Spalding</option>
+            <option value="Stephens">Stephens</option>
+            <option value="Stewart">Stewart</option>
+            <option value="Sumter">Sumter</option>
+            <option value="Talbot">Talbot</option>
+            <option value="Taliaferro">Taliaferro</option>
+            <option value="Tattnall">Tattnall</option>
+            <option value="Taylor">Taylor</option>
+            <option value="Telfair">Telfair</option>
+            <option value="Terrell">Terrell</option>
+            <option value="Thomas">Thomas</option>
+            <option value="Tift">Tift</option>
+            <option value="Toombs">Toombs</option>
+            <option value="Towns">Towns</option>
+            <option value="Treutlen">Treutlen</option>
+            <option value="Troup">Troup</option>
+            <option value="Turner">Turner</option>
+            <option value="Twiggs">Twiggs</option>
+            <option value="Union">Union</option>
+            <option value="Upson">Upson</option>
+            <option value="Walker">Walker</option>
+            <option value="Walton">Walton</option>
+            <option value="Ware">Ware</option>
+            <option value="Warren">Warren</option>
+            <option value="Washington">Washington</option>
+            <option value="Wayne">Wayne</option>
+            <option value="Webster">Webster</option>
+            <option value="Wheeler">Wheeler</option>
+            <option value="White">White</option>
+            <option value="Whitfield">Whitfield</option>
+            <option value="Wilcox">Wilcox</option>
+            <option value="Wilkes">Wilkes</option>
+            <option value="Wilkinson">Wilkinson</option>
+            <option value="Worth">Worth</option>
+        </select>
+        &nbsp; &nbsp;
+
+       Select City :
+        <select name="cityName" 
+                dojoType="dijit.form.ComboBox" 
+                autocomplete="false" 
+                onchange="setVal2" style="width: 99px"> 
+            <option value="Abbeville">Abbeville</option>
+            <option value="Atkinson">Atkinson</option>
+            <option value="Bacon">Bacon</option>
+            <option value="Baker">Baker</option>
+            <option value="Baldwin">Baldwin</option>
+            <option value="Banks">Banks</option>
+        </select> 
+    </div>
+    
+    
+    <div><br /><br /></div>
+                
+    <div id="map" style="width:600px; height:600px; border:1px solid #000;"></div>
+    <div id="tabs" dojoType="dijit.layout.TabContainer" style="width:330px;height:140px; border:1;">
+      <div id="layer2Tab" dojoType="dijit.layout.ContentPane" title="Info"></div>
+      <div id="layer3Tab" dojoType="dijit.layout.ContentPane" title="Chart"></div>
+    </div>
+  </body>
+</html>

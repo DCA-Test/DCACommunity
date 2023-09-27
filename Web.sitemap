@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<!-- SITEMAP FILE FOR MENU CONTROL-->
+<siteMap xmlns="http://schemas.microsoft.com/AspNet/SiteMap-File-1.0" >
+	<siteMapNode url="~/CommunityHomePage.aspx" title="Home" description="Home page for your community" >
+		<siteMapNode url="~/appendixGenerator.aspx" title="Profile" description="Demographics and Community Profile" />
+		<siteMapNode url="~/PlanPrep.aspx" title="Plan" description="Planning Preparation Resources" />
+		<siteMapNode url="~/Action.aspx" title="Action" description="Plan Implementation Resources" />
+		<siteMapNode url="~/map.aspx" title="Map" description="Geographic Information System Resources" />
+		<siteMapNode url="~/docs.aspx" title="Docs" description="Current Plans, Correspondence and other Documents" />
+		<siteMapNode url="~/About.aspx" title="Connect" description="Links to your favorite sites and contact information" />
+	</siteMapNode>
+</siteMap>
