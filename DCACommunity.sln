@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "DCACommunity", "\\webtest\wwwroot\DCACommunity\", "{32B24A74-E979-4C59-BD48-CFB97BD19107}"
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "DCACommunity", "c:\\inetpub\wwwroot\DCACommunity\", "{32B24A74-E979-4C59-BD48-CFB97BD19107}"
 	ProjectSection(WebsiteProperties) = preProject
 		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.0"
 		Debug.AspNetCompiler.VirtualPath = "/DCACommunity"
